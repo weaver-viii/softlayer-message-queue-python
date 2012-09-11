@@ -1,0 +1,4 @@
+requests
+nose
+mock
+rudolf2

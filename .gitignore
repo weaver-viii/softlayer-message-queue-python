@@ -1,0 +1,11 @@
+*.tmp
+*.pyc
+*.swp
+*.egg
+*.egg-info
+dist
+build
+eggs
+sdist
+
+pip-log.txt
