@@ -20,7 +20,7 @@ or the [SoftLayer Developer Network forum](https://forums.softlayer.com/forumdis
 
 For specific issues with the Python client library, get in touch with us via the
 [SoftLayer Developer Network forum](https://forums.softlayer.com/forumdisplay.php?f=27)
-or the [Issues page on our GitHub repository](https://github.com/softlayer/softlayer-message-queue-ruby/issues).
+or the [Issues page on our GitHub repository](https://github.com/softlayer/softlayer-message-queue-python/issues).
 
 License
 -------
