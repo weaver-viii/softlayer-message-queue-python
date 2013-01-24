@@ -10,7 +10,7 @@ if os.path.exists('README.md'):
 
 setup(
     name='softlayer_messaging',
-    version='1.0.1',
+    version='1.0.2',
     description=description,
     long_description=long_description,
     url='http://sldn.softlayer.com/reference/messagequeueapi',
