@@ -5,8 +5,12 @@ This code provides bindings written in Python to communicate with the
 
 Installation
 ------------
-Download source and run:
+Using pip:
+```
+pip install softlayer_messaging
+```
 
+Download source and run:
 ```
 python setup.py install
 ```

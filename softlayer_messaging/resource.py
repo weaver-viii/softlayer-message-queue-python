@@ -1,13 +1,16 @@
 """ See COPYING for license information """
 import requests
 from softlayer_messaging.errors import ResponseError
+from softlayer_messaging.constants import VERSION
 
 
 class Resource(object):
     """ HTTP Wrapper """
     def __init__(self, url):
         self.url = url.rstrip('/')
-        self.headers = {'User-Agent': 'SoftLayer Queue Python'}
+        self.headers = {
+            'User-Agent': 'SoftLayer Queue Python v%s' % VERSION
+        }
 
     def __getitem__(self, key):
         return Resource(self.child_path(key))
