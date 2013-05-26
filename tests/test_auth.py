@@ -2,7 +2,7 @@
 try:
     import unittest2 as unittest
 except:
-    import unittest
+    import unittest  # NOQA
 from softlayer_messaging.auth import QueueAuth
 from softlayer_messaging.errors import Unauthenticated
 from mock import patch, Mock
@@ -14,7 +14,8 @@ class TestAuth(unittest.TestCase):
         self.username = Mock()
         self.api_key = Mock()
         self.auth_token = Mock()
-        self.auth = QueueAuth(self.endpoint, self.username, self.api_key,
+        self.auth = QueueAuth(
+            self.endpoint, self.username, self.api_key,
             auth_token=self.auth_token)
 
     def test_init(self):
@@ -26,10 +27,11 @@ class TestAuth(unittest.TestCase):
     @patch('requests.post')
     def test_auth(self, res):
         self.auth.auth()
-        res.assert_called_once_with(self.endpoint,
+        res.assert_called_once_with(
+            self.endpoint,
             headers={'X-Auth-User': self.username, 'X-Auth-Key': self.api_key})
-        self.assertNotEqual(self.auth_token, self.auth.auth_token,
-            'auth token was set')
+        self.assertNotEqual(
+            self.auth_token, self.auth.auth_token, 'auth token was set')
 
     @patch('requests.post')
     def test_auth_raises_error(self, res):

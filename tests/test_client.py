@@ -2,7 +2,7 @@
 try:
     import unittest2 as unittest
 except:
-    import unittest
+    import unittest  # NOQA
 from softlayer_messaging import get_client
 from softlayer_messaging.client import QueueClient
 from softlayer_messaging.compat import json
@@ -41,7 +41,7 @@ class TestClient(unittest.TestCase):
         self.client.authenticate('username', 'password')
         res.assert_called_with('http://softlayer.com/v1/account/auth', headers={'X-Auth-Key': 'password', 'X-Auth-User': 'username'})
 
-    @patch('requests.request')
+    @patch('requests.get')
     def test_ping_good(self, res):
         res.return_value.error = None
         res.return_value.status_code = 200
@@ -60,16 +60,15 @@ class TestClient(unittest.TestCase):
 
     @patch('requests.request')
     def test_request(self, res):
-        json_resp = Mock()
         header_resp = Mock()
-        res.return_value.error = None
         res.return_value.status_code = 200
-        res.return_value.json = json_resp
+        res.return_value.content = '{"some": "json"}'
         res.return_value.headers = header_resp
         result = self.client.request('GET', 'queues')
-        self.assertEqual(result.json, json_resp)
+        self.assertEqual(result.json, {'some': 'json'})
         self.assertEqual(result.headers, header_resp)
-        res.assert_called_with('GET', '%s/queues' % (self.base_href,),
+        res.assert_called_with(
+            'GET', '%s/queues' % (self.base_href,),
             headers=self.client.headers, auth=None)
 
     @patch('softlayer_messaging.queue.Queue')
@@ -105,7 +104,8 @@ class TestClient(unittest.TestCase):
         name = 'name'
         kwargs = {'arg1': 'arg1', 'arg2': 'arg2'}
         result = self.client.create_queue(name, **kwargs)
-        res.assert_called_with('PUT', 'queues/name',
+        res.assert_called_with(
+            'PUT', 'queues/name',
             data=json.dumps(kwargs))
         self.assertEqual(result, res().json)
 
@@ -114,7 +114,8 @@ class TestClient(unittest.TestCase):
         name = 'name'
         kwargs = {'arg1': 'arg1', 'arg2': 'arg2'}
         result = self.client.create_topic(name, **kwargs)
-        res.assert_called_with('PUT', 'topics/name',
+        res.assert_called_with(
+            'PUT', 'topics/name',
             data=json.dumps(kwargs))
         self.assertEqual(result, res().json)
 

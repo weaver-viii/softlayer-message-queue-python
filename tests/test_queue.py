@@ -2,7 +2,7 @@
 try:
     import unittest2 as unittest
 except:
-    import unittest
+    import unittest  # NOQA
 from softlayer_messaging.queue import Queue, Message
 from softlayer_messaging.compat import json
 from mock import patch, Mock
@@ -23,18 +23,18 @@ class TestQueue(unittest.TestCase):
 
     @patch('requests.request')
     def test_request(self, res):
-        json_resp = Mock()
         header_resp = Mock()
         res.return_value.error = None
         res.return_value.status_code = 200
-        res.return_value.json = json_resp
+        res.return_value.content = '{"some": "json"}'
         res.return_value.headers = header_resp
         self.queue.headers = {'test': Mock()}
         result = self.queue.request('GET', 'messages')
-        self.assertEqual(result.json, json_resp)
+        self.assertEqual(result.json, {'some': 'json'})
         self.assertEqual(result.headers, header_resp)
 
-        res.assert_called_with('GET', '%s/messages' % (self.base_href,),
+        res.assert_called_with(
+            'GET', '%s/messages' % (self.base_href,),
             headers=self.queue.headers, auth=self.auth)
 
     @patch('softlayer_messaging.queue.Queue.request')
@@ -53,11 +53,11 @@ class TestQueue(unittest.TestCase):
     @patch('softlayer_messaging.queue.Queue.request')
     def test_delete_queue(self, res):
         result = self.queue.delete()
-        res.assert_called_with('DELETE')
+        res.assert_called_with('DELETE', params={})
         self.assertEqual(result, True)
 
     @patch('softlayer_messaging.queue.Queue.request')
-    def test_delete_queue(self, res):
+    def test_delete_queue_force(self, res):
         result = self.queue.delete(force=True)
         res.assert_called_with('DELETE', params={'force': 1})
         self.assertEqual(result, True)
@@ -68,7 +68,8 @@ class TestQueue(unittest.TestCase):
         message_options = {'option_a': 'a', 'option_b': 'b'}
         result = self.queue.push(message_body, **message_options)
         json_doc = {'body': 'body', 'option_a': 'a', 'option_b': 'b'}
-        res.assert_called_with('POST', 'messages',
+        res.assert_called_with(
+            'POST', 'messages',
             data=json.dumps(json_doc))
         self.assertEqual(result, res().json)
 
@@ -103,18 +104,18 @@ class TestMessage(unittest.TestCase):
 
     @patch('requests.request')
     def test_request(self, res):
-        json_resp = Mock()
         header_resp = Mock()
         res.return_value.error = None
         res.return_value.status_code = 200
-        res.return_value.json = json_resp
+        res.return_value.content = '{"some": "json"}'
         res.return_value.headers = header_resp
         self.message.headers = {'test': Mock()}
         result = self.message.request('DELETE')
-        self.assertEqual(result.json, json_resp)
+        self.assertEqual(result.json, {'some': 'json'})
         self.assertEqual(result.headers, header_resp)
 
-        res.assert_called_with('DELETE', self.base_href,
+        res.assert_called_with(
+            'DELETE', self.base_href,
             headers=self.message.headers, auth=self.auth)
 
     def test_client_init(self):

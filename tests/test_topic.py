@@ -2,7 +2,7 @@
 try:
     import unittest2 as unittest
 except:
-    import unittest
+    import unittest  # NOQA
 from softlayer_messaging.topic import Topic, Subscription
 from softlayer_messaging.compat import json
 from mock import patch, Mock
@@ -24,18 +24,18 @@ class TestTopic(unittest.TestCase):
 
     @patch('requests.request')
     def test_request(self, res):
-        json_resp = Mock()
         header_resp = Mock()
         res.return_value.error = None
         res.return_value.status_code = 200
-        res.return_value.json = json_resp
+        res.return_value.content = '{"some": "json"}'
         res.return_value.headers = header_resp
         self.topic.headers = {'test': Mock()}
         result = self.topic.request('GET', 'messages')
-        self.assertEqual(result.json, json_resp)
+        self.assertEqual(result.json, {'some': 'json'})
         self.assertEqual(result.headers, header_resp)
 
-        res.assert_called_with('GET', '%s/messages' % (self.base_href,),
+        res.assert_called_with(
+            'GET', '%s/messages' % (self.base_href,),
             headers=self.topic.headers, auth=self.auth)
 
     @patch('softlayer_messaging.topic.Topic.request')
@@ -54,11 +54,11 @@ class TestTopic(unittest.TestCase):
     @patch('softlayer_messaging.topic.Topic.request')
     def test_delete_topic(self, res):
         result = self.topic.delete()
-        res.assert_called_with('DELETE')
+        res.assert_called_with('DELETE', params={})
         self.assertEqual(result, True)
 
     @patch('softlayer_messaging.topic.Topic.request')
-    def test_delete_topic(self, res):
+    def test_delete_topic_force(self, res):
         result = self.topic.delete(force=True)
         res.assert_called_with('DELETE', params={'force': 1})
         self.assertEqual(result, True)
@@ -69,7 +69,8 @@ class TestTopic(unittest.TestCase):
         message_options = {'option_a': 'a', 'option_b': 'b'}
         result = self.topic.push(message_body, **message_options)
         json_doc = {'body': 'body', 'option_a': 'a', 'option_b': 'b'}
-        res.assert_called_with('POST', 'messages',
+        res.assert_called_with(
+            'POST', 'messages',
             data=json.dumps(json_doc))
         self.assertEqual(result, res().json)
 
@@ -85,7 +86,8 @@ class TestTopic(unittest.TestCase):
         options = {'arg1': 'arg1', 'arg2': 'arg2'}
         result = self.topic.create_subscription(type_, **options)
         subscription = {"endpoint_type": type_, "endpoint": options}
-        res.assert_called_with('POST', 'subscriptions',
+        res.assert_called_with(
+            'POST', 'subscriptions',
             data=json.dumps(subscription))
         self.assertEqual(result, res().json)
 
@@ -117,17 +119,17 @@ class TestSubscription(unittest.TestCase):
 
     @patch('requests.request')
     def test_request(self, res):
-        json_resp = Mock()
         header_resp = Mock()
         res.return_value.error = None
         res.return_value.status_code = 200
-        res.return_value.json = json_resp
+        res.return_value.content = '{"some": "json"}'
         res.return_value.headers = header_resp
         self.sub.headers = {'test': Mock()}
         result = self.sub.request('GET', 'path')
-        self.assertEqual(result.json, json_resp)
+        self.assertEqual(result.json, {'some': 'json'})
         self.assertEqual(result.headers, header_resp)
-        res.assert_called_with('GET', '%s/path' % (self.base_href,),
+        res.assert_called_with(
+            'GET', '%s/path' % (self.base_href,),
             headers=self.sub.headers, auth=self.auth)
 
     @patch('softlayer_messaging.topic.Subscription.request')

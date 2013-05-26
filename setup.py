@@ -10,12 +10,12 @@ if os.path.exists('README.md'):
 
 setup(
     name='softlayer_messaging',
-    version='1.0.2',
+    version='1.0.3',
     description=description,
     long_description=long_description,
     url='http://sldn.softlayer.com/reference/messagequeueapi',
-    author='Kevin McDonald',
-    author_email='kmcdonald@softlayer.com',
+    author='SoftLayer Technologies, Inc.',
+    author_email='sldn@softlayer.com',
     license='The BSD License',
     install_requires=['requests'],
     tests_require=['nose', 'mock'],

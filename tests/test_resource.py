@@ -2,10 +2,10 @@
 try:
     import unittest2 as unittest
 except:
-    import unittest
+    import unittest  # NOQA
 from softlayer_messaging.resource import Resource, Response
 from softlayer_messaging.errors import ResponseError
-from mock import patch, Mock, MagicMock
+from mock import patch, Mock
 
 
 class TestResource(unittest.TestCase):
@@ -75,8 +75,8 @@ class TestResource(unittest.TestCase):
         kwargs = {'test': Mock()}
         result = r.request(method, 'path/to/file', **kwargs)
         kwargs['headers'] = r.headers
-        mocked.assert_called_with(method, 'http://softlayer.com/path/to/file',
-            **kwargs)
+        mocked.assert_called_with(
+            method, 'http://softlayer.com/path/to/file', **kwargs)
         self.assertIsInstance(result, Response)
 
     @patch('requests.request')
@@ -87,7 +87,8 @@ class TestResource(unittest.TestCase):
         custom_headers = {'header1': Mock()}
         result = r.request(method, 'path/to/file', headers=custom_headers)
         custom_headers.update(r.headers)
-        mocked.assert_called_with(method, 'http://softlayer.com/path/to/file',
+        mocked.assert_called_with(
+            method, 'http://softlayer.com/path/to/file',
             headers=custom_headers)
         self.assertIsInstance(result, Response)
 
@@ -107,10 +108,8 @@ class TestResponse(unittest.TestCase):
         self.assertEqual(response.url, original_response.url)
         self.assertEqual(response.headers, original_response.headers)
         self.assertEqual(response.request, original_response.request)
-        self.assertEqual(response.error, original_response.error)
         self.assertEqual(response.content, original_response.content)
         self.assertEqual(response.text, original_response.text)
-        self.assertEqual(response.json, original_response.json)
 
     def test_response_repr(self):
         original_response = Mock()
@@ -129,13 +128,12 @@ class TestResponse(unittest.TestCase):
         original_response = Mock()
         original_response.error = None
         original_response.status_code = 500
-        message = Mock()
-        original_response.json = {'message': message}
+        original_response.content = '{"message": "error"}'
         response = Response(original_response)
         try:
             response.raise_for_status()
         except ResponseError as e:
-            self.assertEqual(str(e), "500: %s" % (message,))
+            self.assertEqual(str(e), "500: error")
         else:
             self.fail("Did not raise a Response Error")
 
@@ -143,14 +141,15 @@ class TestResponse(unittest.TestCase):
         original_response = Mock()
         original_response.error = None
         original_response.status_code = 500
-        message = Mock()
-        errors = Mock()
-        original_response.json = {'message': message, 'errors': errors}
+        original_response.content = '''{
+            "message": "Error",
+            "errors": ["Error 1", "Error 2"]
+        }'''
         response = Response(original_response)
         try:
             response.raise_for_status()
         except ResponseError as e:
-            self.assertEqual(str(e), "500: %s -> %r" % (message, errors))
+            self.assertEqual(str(e), "500: Error -> [Error 1, Error 2]")
         else:
             self.fail("Did not raise a Response Error")
 

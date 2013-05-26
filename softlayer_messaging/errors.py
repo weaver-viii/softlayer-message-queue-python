@@ -11,7 +11,8 @@ class ResponseError(Exception):
 
     def __repr__(self):
         if self.errors:
-            return "%s -> %r" % (self.args[0], self.errors)
+            error_string = ', '.join(self.errors)
+            return "%s -> [%s]" % (self.args[0], error_string)
         else:
             return "%s" % (self.args[0], )
 

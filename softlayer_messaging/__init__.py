@@ -4,8 +4,10 @@ SoftLayer Message Queue Python Client
 Example Usage:
     import softlayer_messaging
 
-    client = softlayer_messaging.get_client('YOUR_ACCOUNT', 'YOUR_USERNAME',
-        api_key='YOUR_API_KEY', endpoint='https://dal05.mq.softlayer.net/')
+    client = softlayer_messaging.get_client(
+        'YOUR_ACCOUNT',
+        endpoint='https://dal05.mq.softlayer.net/')
+    client.authenticate('YOUR_USERNAME', 'YOUR_API_KEY')
 
     print(client.queues())
 

@@ -22,7 +22,7 @@ class QueueAuth(requests.auth.AuthBase):
         else:
             raise Unauthenticated("Error while authenticating", resp)
 
-    def handle_error(self, r):
+    def handle_error(self, r, **kwargs):
         r.request.deregister_hook('response', self.handle_error)
         if r.status_code == 503:
             r.request.send(anyway=True)

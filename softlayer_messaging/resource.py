@@ -1,4 +1,5 @@
 """ See COPYING for license information """
+import json
 import requests
 from softlayer_messaging.errors import ResponseError
 from softlayer_messaging.constants import VERSION
@@ -54,7 +55,6 @@ class Response(object):
         self.url = self.resp.url
         self.headers = self.resp.headers
         self.request = self.resp.request
-        self.error = self.resp.error
 
     def __repr__(self):
         return '<Response [%s]>' % (self.status_code)
@@ -69,12 +69,9 @@ class Response(object):
 
     @property
     def json(self):
-        return self.resp.json
+        return json.loads(self.resp.content)
 
     def raise_for_status(self):
-        if self.error:
-            raise self.error
-
         if self.status_code >= 400:
             code = self.status_code
             message = "Error"
