@@ -22,14 +22,14 @@ class QueueAuth(requests.auth.AuthBase):
         else:
             raise Unauthenticated("Error while authenticating", resp)
 
-    def handle_error(self, r, **kwargs):
-        r.request.deregister_hook('response', self.handle_error)
-        if r.status_code == 503:
-            r.request.send(anyway=True)
-        elif r.status_code == 401:
+    def handle_error(self, resp, **kwargs):
+        resp.request.deregister_hook('response', self.handle_error)
+        if resp.status_code == 503:
+            resp.connection.send(resp.request)
+        elif resp.status_code == 401:
             self.auth()
-            r.request.headers['X-Auth-Token'] = self.auth_token
-            r.request.send(anyway=True)
+            resp.request.headers['X-Auth-Token'] = self.auth_token
+            resp.connection.send(resp.request)
 
     def __call__(self, r):
         if not self.auth_token:

@@ -44,7 +44,7 @@ class TestAuth(unittest.TestCase):
         m = Mock()
         m.status_code = 503
         self.auth.handle_error(m)
-        m.request.send.assert_called_once_with(anyway=True)
+        m.connection.send.assert_called_once_with(m.request)
 
     def test_auth_handle_error_reauth_on_401(self):
         self.auth.auth = Mock()
@@ -53,7 +53,7 @@ class TestAuth(unittest.TestCase):
         m.request.headers = {}
         self.auth.handle_error(m)
         self.auth.auth.assert_called_once()
-        m.request.send.assert_called_once_with(anyway=True)
+        m.connection.send.assert_called_once_with(m.request)
 
     def test_call(self):
         request = Mock()
